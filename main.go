@@ -65,30 +65,34 @@ func (c *Collector) Collect(ch chan<- prometheus.Metric) {
 			metricName = strings.Replace(metricName, "/", "_per_", -1)
 			metricName = invalidMetricChars.ReplaceAllString(metricName, "_")
 			metricValue := value.Timeseries[0].Data[len(value.Timeseries[0].Data)-1]
-			labels := CreateResourceLabels(value.ID)
+			labels, values := CreateResourceLabels(value.ID)
 
 			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc(metricName+"_total", "", nil, labels),
+				prometheus.NewDesc(metricName+"_total", "", labels, nil),
 				prometheus.GaugeValue,
 				metricValue.Total,
+                values...,
 			)
 
 			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc(metricName+"_average", "", nil, labels),
+				prometheus.NewDesc(metricName+"_average", "", labels, nil),
 				prometheus.GaugeValue,
 				metricValue.Average,
+                values...,
 			)
 
 			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc(metricName+"_min", "", nil, labels),
+				prometheus.NewDesc(metricName+"_min", "", labels, nil),
 				prometheus.GaugeValue,
 				metricValue.Minimum,
+                values...,
 			)
 
 			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc(metricName+"_max", "", nil, labels),
+				prometheus.NewDesc(metricName+"_max", "", labels, nil),
 				prometheus.GaugeValue,
 				metricValue.Maximum,
+                values...,
 			)
 		}
 	}
